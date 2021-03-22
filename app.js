@@ -1,8 +1,9 @@
 //Modulos
 let express = require('express');
 let app = express();
-app.use(express.static('public'));
+let swig = require('swig');
 let bodyParser = require('body-parser');
+app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -10,8 +11,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', 8081);
 
 //Rutas (controladores)
-require("./routes/rusuarios.js")(app);
-require("./routes/rcanciones.js")(app);
+require("./routes/rusuarios.js")(app, swig);
+require("./routes/rcanciones.js")(app, swig);
 
 //Lanzamiento del servidor
 app.listen(app.get('port'), function(){
