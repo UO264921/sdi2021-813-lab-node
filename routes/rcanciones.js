@@ -1,4 +1,4 @@
-module.exports = function(app, swig, mongo) {
+module.exports = function(app, swig, gestorBD) {
     app.get('/suma', function(req, res) {
         let respuesta = parseInt(req.query.num1) + parseInt(req.query.num2);
         res.send(String(respuesta));
@@ -29,20 +29,13 @@ module.exports = function(app, swig, mongo) {
         }
 
         // Nos conectamos a la base
-        mongo.MongoClient.connect(app.get('db'), function(err, db) {
-            if (err) {
-                res.send("Error de conexión: " + err);
+        gestorBD.insertarCancion(cancion, function(id){
+            if (id == null){
+                res.send("Error al insertar la canción");
             } else {
-                let collection = db.collection('canciones');
-                collection.insertOne(cancion, function(err, result) {
-                    if (err) {
-                        res.send("Error al insertar " + err);
-                    } else {
-                        res.send("Agregada id: "+ result.ops[0]._id);
-                    } db.close();
-                });
+                res.send("Agregada la canción ID: " + id);
             }
-        });
+        })
     });
 
     app.get('/promo*', function (req, res) {
