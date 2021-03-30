@@ -1,19 +1,19 @@
 module.exports = {
-    mongo : null,
-    app : null,
+    mongo: null,
+    app: null,
 
-    init : function(app, mongo) {
+    init: function (app, mongo) {
         this.mongo = mongo;
         this.app = app;
-        },
+    },
 
-    insertarCancion : function(cancion, funcionCallback) {
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+    insertarCancion: function (cancion, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('canciones');
-                collection.insertOne(cancion, function(err, result) {
+                collection.insertOne(cancion, function (err, result) {
                     if (err) {
                         funcionCallback(null);
                     } else {
@@ -22,6 +22,24 @@ module.exports = {
                     db.close();
                 });
             }
-    });
-    }
+        });
+    },
+
+    obtenerCanciones: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('canciones');
+                collection.find(criterio).toArray(function (err, canciones) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(canciones);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
 };
