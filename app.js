@@ -63,6 +63,7 @@ app.set('port', 8081);
 //Rutas (controladores)
 require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rcanciones.js")(app, swig, gestorBD);
+require("./routes/rcomentarios.js")(app, swig, gestorBD);
 require("./routes/rautores.js")(app, swig);
 
 //Lanzamiento del servidor

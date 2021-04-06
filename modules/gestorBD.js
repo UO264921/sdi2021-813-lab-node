@@ -79,13 +79,13 @@ module.exports = {
         });
     },
 
-    modificarCancion : function(criterio, cancion, funcionCallback) {
-        this.mongo.MongoClient.connect(this.app.get('db'), function(err, db) {
+    modificarCancion: function (criterio, cancion, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
             if (err) {
                 funcionCallback(null);
             } else {
                 let collection = db.collection('canciones');
-                collection.update(criterio, {$set: cancion}, function(err, result) {
+                collection.update(criterio, {$set: cancion}, function (err, result) {
                     if (err) {
                         funcionCallback(null);
                     } else {
@@ -94,5 +94,42 @@ module.exports = {
                     db.close();
                 });
             }
-        }); },
+        });
+    },
+
+    obtenerComentarios: function (criterio, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('comentarios');
+                collection.find(criterio).toArray(function (err, comentarios) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(comentarios);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
+
+    insertarComentario: function (comentario, funcionCallback) {
+        this.mongo.MongoClient.connect(this.app.get('db'), function (err, db) {
+            if (err) {
+                funcionCallback(null);
+            } else {
+                let collection = db.collection('comentarios');
+                collection.insertOne(comentario, function (err, result) {
+                    if (err) {
+                        funcionCallback(null);
+                    } else {
+                        funcionCallback(result.ops[0]._id);
+                    }
+                    db.close();
+                });
+            }
+        });
+    },
 };
