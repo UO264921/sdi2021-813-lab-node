@@ -55,6 +55,27 @@ routerAudios.use(function (req, res, next) {
 //Aplicar routerAudios
 app.use("/audios/", routerAudios);
 
+//routerUsuarioAutor
+let routerUsuarioAutor = express.Router();
+routerUsuarioAutor.use(function(req, res, next) {
+    console.log("routerUsuarioAutor");
+    let path = require('path');
+    let id = path.basename(req.originalUrl);
+    gestorBD.obtenerCanciones(
+        {_id: mongo.ObjectID(id) }, function (canciones) {
+            console.log(canciones[0]);
+            if(canciones[0].autor == req.session.usuario ){
+                next();
+            } else {
+                res.redirect("/tienda");
+            }
+        })
+});
+
+//Aplicar routerUsuarioAutor
+app.use("/cancion/modificar",routerUsuarioAutor);
+app.use("/cancion/eliminar",routerUsuarioAutor);
+
 app.use(express.static('public'));
 
 //Variables
