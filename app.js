@@ -8,6 +8,9 @@ let fileUpload = require('express-fileupload');
 let gestorBD = require("./modules/gestorBD.js");
 let crypto = require('crypto');
 let expressSession = require('express-session');
+let fs = require('fs');
+let https = require('https');
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -44,7 +47,7 @@ routerAudios.use(function (req, res, next) {
     let path = require('path');
     let idCancion = path.basename(req.originalUrl, '.mp3');
     gestorBD.obtenerCanciones({"_id": mongodb.ObjectID(idCancion)}, function (canciones) {
-        if (req.session.usuario && canciones[0].autor == req.session.usuario) {
+        if (req.session.usuario && canciones[0].autor === req.session.usuario) {
             next();
         } else {
             let criterio = {
@@ -75,7 +78,7 @@ routerUsuarioAutor.use(function (req, res, next) {
     gestorBD.obtenerCanciones(
         {_id: mongo.ObjectID(id)}, function (canciones) {
             console.log(canciones[0]);
-            if (canciones[0].autor == req.session.usuario) {
+            if (canciones[0].autor === req.session.usuario) {
                 next();
             } else {
                 res.redirect("/tienda");
@@ -104,7 +107,18 @@ app.get('/', function (req, res) {
     res.redirect('/tienda');
 })
 
+app.use(function(err,req,res){
+    console.log("Error producido " + err)
+    if (!res.headersSent){
+        res.status(400);
+        res.send("Recurso no disponible");
+    }
+})
+
 //Lanzamiento del servidor
-app.listen(app.get('port'), function () {
-    console.log('Servidor activo');
+https.createServer({
+    key: fs.readFileSync('certificates/alice.key'),
+    cert: fs.readFileSync('certificates/alice.crt')
+}, app).listen(app.get('port'), function() {
+    console.log("Servidor activo");
 });
