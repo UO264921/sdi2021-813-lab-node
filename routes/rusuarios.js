@@ -31,7 +31,6 @@ module.exports = function (app, swig, gestorBD) {
             }
         });
 
-
     });
 
     app.get("/identificarse", function (req, res) {

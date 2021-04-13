@@ -76,8 +76,7 @@ routerUsuarioAutor.use(function (req, res, next) {
     let path = require('path');
     let id = path.basename(req.originalUrl);
     gestorBD.obtenerCanciones(
-        {_id: mongo.ObjectID(id)}, function (canciones) {
-            console.log(canciones[0]);
+        {_id: mongodb.ObjectID(id)}, function (canciones) {
             if (canciones[0].autor === req.session.usuario) {
                 next();
             } else {
@@ -91,6 +90,34 @@ app.use("/cancion/modificar", routerUsuarioAutor);
 app.use("/cancion/eliminar", routerUsuarioAutor);
 app.use("/cancion/comprar", routerUsuarioSession);
 app.use("/compras", routerUsuarioSession);
+
+
+//routerUsuarioNoAutorNoComprada
+let routerUsuarioNoAutorNoComprada = express.Router();
+routerUsuarioNoAutorNoComprada.use(function (req, res, next) {
+    console.log("routerUsuarioNoAutorNoComprada");
+    let path = require('path');
+    let id = path.basename(req.originalUrl);
+    gestorBD.obtenerCanciones(
+        {_id: mongodb.ObjectID(id)}, function (canciones) {
+            if (canciones[0].autor != req.session.usuario) {
+                gestorBD.obtenerCompras(
+                    {"usuario": req.session.usuario, "cancionId": canciones[0]._id}, function (compradas) {
+                        if (compradas.length == 0) {
+                            next();
+                        } else {
+                            res.redirect("/tienda?mensaje=La cancion ya ha sido comprada previamente&tipoMensaje=alert-danger");
+                        }
+                    })
+            } else {
+                res.redirect("/tienda?mensaje=La cancion ha sido publicada por el usuario, no se ha podido comprar&tipoMensaje=alert-danger");
+            }
+        })
+});
+
+//aplicar routerUsuarioNoAutorNoComprada
+app.use("/cancion/comprar/", routerUsuarioNoAutorNoComprada);
+
 
 app.use(express.static('public'));
 
@@ -107,13 +134,15 @@ app.get('/', function (req, res) {
     res.redirect('/tienda');
 })
 
-app.use(function(err,req,res){
+
+app.use(function(err,req,res,next){
     console.log("Error producido " + err)
     if (!res.headersSent){
         res.status(400);
         res.send("Recurso no disponible");
     }
 })
+
 
 //Lanzamiento del servidor
 https.createServer({
