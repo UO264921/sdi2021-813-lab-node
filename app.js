@@ -91,7 +91,6 @@ app.use("/cancion/eliminar", routerUsuarioAutor);
 app.use("/cancion/comprar", routerUsuarioSession);
 app.use("/compras", routerUsuarioSession);
 
-
 //routerUsuarioNoAutorNoComprada
 let routerUsuarioNoAutorNoComprada = express.Router();
 routerUsuarioNoAutorNoComprada.use(function (req, res, next) {
@@ -106,11 +105,11 @@ routerUsuarioNoAutorNoComprada.use(function (req, res, next) {
                         if (compradas.length == 0) {
                             next();
                         } else {
-                            res.redirect("/tienda?mensaje=La cancion ya ha sido comprada previamente&tipoMensaje=alert-danger");
+                            res.redirect("/error?mensaje=La cancion ya ha sido comprada previamente&tipoMensaje=alert-danger");
                         }
                     })
             } else {
-                res.redirect("/tienda?mensaje=La cancion ha sido publicada por el usuario, no se ha podido comprar&tipoMensaje=alert-danger");
+                res.redirect("/error?mensaje=La cancion ha sido publicada por el usuario, no se ha podido comprar&tipoMensaje=alert-danger");
             }
         })
 });
@@ -129,6 +128,7 @@ require("./routes/rusuarios.js")(app, swig, gestorBD);
 require("./routes/rcanciones.js")(app, swig, gestorBD);
 require("./routes/rcomentarios.js")(app, swig, gestorBD);
 require("./routes/rautores.js")(app, swig);
+require("./routes/rerror.js")(app, swig);
 
 app.get('/', function (req, res) {
     res.redirect('/tienda');
