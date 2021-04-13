@@ -15,8 +15,7 @@
 
             {% if (cancionAutor.length== 0 && cancion.autor != autor) %}
             <a class="btn btn-primary pull-right"
-               href="/cancion/comprar/{{cancion._id.toString()}}">{{ cancion.precio
-                }}€
+               href="/cancion/comprar/{{cancion._id.toString()}}">{{ cancion.precio }} € - {{ cancion.usd }} $
             </a>
             {% else %}
             <audio controls>

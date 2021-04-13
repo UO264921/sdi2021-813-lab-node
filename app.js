@@ -11,6 +11,7 @@ let expressSession = require('express-session');
 let fs = require('fs');
 let https = require('https');
 let jwt = require('jsonwebtoken');
+let rest = require('request');
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -32,6 +33,8 @@ app.set('db', 'mongodb://admin:sdi@tiendamusica-shard-00-00.essby.mongodb.net:27
 app.set('clave', 'abcdefg');
 app.set('crypto', crypto);
 app.set('jwt',jwt);
+app.set('rest',rest);
+
 gestorBD.init(app, mongodb);
 
 var routerUsuarioSession = express.Router();
