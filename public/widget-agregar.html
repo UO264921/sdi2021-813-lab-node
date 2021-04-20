@@ -51,7 +51,9 @@
 
             },
             error : function (error){
-                $( "#contenedor-principal" ).load("widget-login.html");
+                $( "#contenedor-principal" ).load("widget-canciones.html", function(){
+                    $( "#contenedor-principal" ).prepend("<div class='alert alert-danger'>"+error.responseJSON.error+"</div>");
+                })
             }
         });
     }

@@ -16,7 +16,6 @@ module.exports = function(app, gestorBD) {
 
     app.get("/api/cancion/:id", function (req, res) {
         let criterio = {"_id": gestorBD.mongo.ObjectID(req.params.id)}
-
         gestorBD.obtenerCanciones(criterio, function (canciones) {
             if (canciones == null) {
                 res.status(500);
@@ -31,43 +30,76 @@ module.exports = function(app, gestorBD) {
     });
 
     app.delete("/api/cancion/:id", function(req, res) {
-        let criterio = { "_id" : gestorBD.mongo.ObjectID(req.params.id)}
-
-        gestorBD.eliminarCancion(criterio,function(canciones){
-            if ( canciones == null ){
+        let criterio = {
+            "_id" : gestorBD.mongo.ObjectID(req.params.id),
+        }
+        gestorBD.obtenerCanciones(criterio, function(cancion){
+            console.log(cancion[0].autor);
+            if (cancion[0].autor == res.usuario){
+                gestorBD.eliminarCancion(criterio,function(canciones){
+                    if ( canciones == null ){
+                        res.status(500);
+                        res.json({
+                            error : "se ha producido un error"
+                        })
+                    } else {
+                        res.status(200);
+                        res.send( JSON.stringify(canciones) );
+                    }
+                });
+            } else {
                 res.status(500);
                 res.json({
-                    error : "se ha producido un error"
+                    error : "No eres el autor de la cancion"
                 })
-            } else {
-                res.status(200);
-                res.send( JSON.stringify(canciones) );
             }
-        });
+        })
+
     });
 
     app.post("/api/cancion", function(req, res) {
-        let cancion = {
-            nombre : req.body.nombre,
-            genero : req.body.genero,
-            precio : req.body.precio,
+        if ( req.body.nombre == null || req.body.nombre.length < 4) {
+            res.status(500);
+            res.json({
+                error:"El nombre debe tener como minimo 4 caracteres"
+            })
         }
-        // ¿Validar nombre, genero, precio?
+        else if ( req.body.genero == null || req.body.genero.length < 2){
+            res.status(501);
+            res.json({
+                error:"El genero debe tener como minimo 2 caracteres"
+            })
+        }
+        else if ( req.body.precio == null || req.body.precio <= 0){
+            res.status(502);
+            res.json({
+                error:"El precio debe ser mayor de 0"
+             })
+        }
+        else {
 
-        gestorBD.insertarCancion(cancion, function(id){
-            if (id == null) {
-                res.status(500);
-                res.json({
-                    error : "se ha producido un error"
-                })
-            } else {
-                res.status(201);
-                res.json({
-                    mensaje : "canción insertada",
-                    _id : id
-                })
+            let cancion = {
+                nombre: req.body.nombre,
+                genero: req.body.genero,
+                precio: req.body.precio,
+                autor: res.usuario
             }
-        });
+
+            gestorBD.insertarCancion(cancion, function (id) {
+                if (id == null) {
+                    res.status(503);
+                    res.json({
+                        error: "se ha producido un error"
+                    })
+                } else {
+                    res.status(201);
+                    res.json({
+                        mensaje: "canción insertada",
+                        _id: id
+                    })
+                }
+            });
+        }
 
     });
 
